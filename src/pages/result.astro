@@ -1,0 +1,166 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="result-container">
+    <h1>测试结果</h1>
+    <div id="mbti-result">
+      <div id="type-title"></div>
+      <div id="type-desc"></div>
+      <div id="type-adv"></div>
+      <div id="type-career"></div>
+    </div>
+  </div>
+</Layout>
+
+<script type="module">
+const mbtiData = {
+  'INTJ': {
+    name: 'INTJ - 建筑师',
+    desc: '独立、战略性强，善于规划未来，喜欢独立思考和创新。',
+    adv: '优势：逻辑清晰、目标导向、善于解决复杂问题。',
+    career: '适合职业：科学家、工程师、战略顾问、程序员等。'
+  },
+  'INTP': {
+    name: 'INTP - 逻辑学家',
+    desc: '理性、好奇，喜欢分析和理论推导，追求真理。',
+    adv: '优势：分析能力强、创新、独立。',
+    career: '适合职业：研究员、开发工程师、学者、数据分析师等。'
+  },
+  'ENTJ': {
+    name: 'ENTJ - 指挥官',
+    desc: '果断、领导力强，善于组织和管理，喜欢挑战。',
+    adv: '优势：决策力强、执行力高、善于管理。',
+    career: '适合职业：企业高管、项目经理、律师、创业者等。'
+  },
+  'ENTP': {
+    name: 'ENTP - 辩论家',
+    desc: '机智、善于表达，喜欢创新和辩论，思维活跃。',
+    adv: '优势：思维敏捷、善于创新、适应力强。',
+    career: '适合职业：市场策划、咨询师、发明家、媒体人等。'
+  },
+  'INFJ': {
+    name: 'INFJ - 提倡者',
+    desc: '理想主义、富有同理心，关注他人和社会价值。',
+    adv: '优势：洞察力强、富有同情心、善于激励他人。',
+    career: '适合职业：心理咨询师、教师、作家、社会工作者等。'
+  },
+  'INFP': {
+    name: 'INFP - 调停者',
+    desc: '温和、理想主义，重视内心价值和情感。',
+    adv: '优势：富有想象力、忠诚、善于倾听。',
+    career: '适合职业：作家、心理师、设计师、艺术家等。'
+  },
+  'ENFJ': {
+    name: 'ENFJ - 主人公',
+    desc: '外向、关心他人，善于沟通和组织，激励团队。',
+    adv: '优势：沟通能力强、组织力强、富有感染力。',
+    career: '适合职业：教师、公关、管理者、心理顾问等。'
+  },
+  'ENFP': {
+    name: 'ENFP - 竞选者',
+    desc: '热情、富有创造力，喜欢探索新事物和激励他人。',
+    adv: '优势：创造力强、适应力强、乐观。',
+    career: '适合职业：创意总监、市场营销、作家、心理师等。'
+  },
+  'ISTJ': {
+    name: 'ISTJ - 物流师',
+    desc: '务实、可靠，注重细节和规则，责任心强。',
+    adv: '优势：有条理、守信、执行力强。',
+    career: '适合职业：会计、审计、行政、工程师等。'
+  },
+  'ISFJ': {
+    name: 'ISFJ - 守卫者',
+    desc: '温和、细心，乐于助人，重视传统和安全。',
+    adv: '优势：耐心、责任心强、善于照顾他人。',
+    career: '适合职业：护士、教师、行政、社会服务等。'
+  },
+  'ESTJ': {
+    name: 'ESTJ - 总经理',
+    desc: '实际、果断，善于组织和管理，注重效率。',
+    adv: '优势：组织力强、执行力高、务实。',
+    career: '适合职业：管理者、项目经理、警察、军官等。'
+  },
+  'ESFJ': {
+    name: 'ESFJ - 执政官',
+    desc: '外向、乐于助人，重视团队和谐，善于协调。',
+    adv: '优势：善于沟通、组织、关心他人。',
+    career: '适合职业：教师、护士、客服、行政等。'
+  },
+  'ISTP': {
+    name: 'ISTP - 鉴赏家',
+    desc: '冷静、务实，喜欢动手实践和解决问题。',
+    adv: '优势：动手能力强、适应力强、独立。',
+    career: '适合职业：工程师、机械师、飞行员、运动员等。'
+  },
+  'ISFP': {
+    name: 'ISFP - 探险家',
+    desc: '温和、灵活，喜欢自由和艺术，重视个人体验。',
+    adv: '优势：感性、适应力强、富有美感。',
+    career: '适合职业：设计师、艺术家、厨师、摄影师等。'
+  },
+  'ESTP': {
+    name: 'ESTP - 企业家',
+    desc: '果断、现实，喜欢冒险和挑战，善于应变。',
+    adv: '优势：行动力强、适应力强、善于交际。',
+    career: '适合职业：销售、企业家、运动员、急救员等。'
+  },
+  'ESFP': {
+    name: 'ESFP - 表演者',
+    desc: '外向、乐观，喜欢娱乐和与人互动，享受当下。',
+    adv: '优势：乐观、感染力强、善于表达。',
+    career: '适合职业：演员、主持人、销售、活动策划等。'
+  },
+};
+
+function getTypeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('type')?.toUpperCase();
+}
+
+const type = getTypeFromUrl();
+const data = mbtiData[type];
+if (data) {
+  document.getElementById('type-title').innerHTML = `<h2>${data.name}</h2>`;
+  document.getElementById('type-desc').innerHTML = `<p>${data.desc}</p>`;
+  document.getElementById('type-adv').innerHTML = `<p>${data.adv}</p>`;
+  document.getElementById('type-career').innerHTML = `<p>${data.career}</p>`;
+} else {
+  document.getElementById('mbti-result').innerHTML = '<p>未检测到有效的 MBTI 类型，请先完成测试。</p>';
+}
+</script>
+
+<style>
+.result-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 32px 16px;
+  background: rgba(255,255,255,0.97);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(74,108,247,0.08);
+  font-family: Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+.result-container h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(83.21deg, #4a6cf7 0%, #bc52ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#mbti-result {
+  font-size: 1.1rem;
+  color: #333;
+  line-height: 1.7;
+}
+#mbti-result h2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.7rem;
+  color: #4a6cf7;
+  font-size: 1.4rem;
+}
+#mbti-result p {
+  margin: 0.5rem 0;
+}
+</style>

@@ -1,0 +1,386 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="mbti-test-card">
+    <header class="mbti-header">
+      <h1 class="mbti-title">MBTI性格特质测试</h1>
+      <div class="mbti-subtitle">国际通用版MBTI人格测试(16人格)</div>
+    </header>
+    <section class="mbti-question-area">
+      <div class="mbti-q-top">
+        <span class="mbti-q-index" id="q-index">01 / 20</span>
+        <div class="mbti-progress-bar-bg">
+          <div class="mbti-progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+      <div class="mbti-q-text" id="q-text"></div>
+      <div class="mbti-options">
+        <label class="mbti-option" id="labelA">
+          <input type="radio" name="mbti-option" id="optionA" value="A" />
+          <span class="mbti-option-text" id="optionA-text"></span>
+        </label>
+        <label class="mbti-option" id="labelB">
+          <input type="radio" name="mbti-option" id="optionB" value="B" />
+          <span class="mbti-option-text" id="optionB-text"></span>
+        </label>
+      </div>
+    </section>
+    <div class="mbti-nav-row">
+      <button class="mbti-btn mbti-btn-prev" id="btn-prev">&lt;&lt; 上一题</button>
+      <button class="mbti-btn mbti-btn-next" id="btn-next">下一题 &gt;&gt;</button>
+    </div>
+
+  </div>
+</Layout>
+
+<script type="module" client:load>
+/**
+ * 题库数据，20题，覆盖E/I、S/N、T/F、J/P四个维度
+ * 每题A/B分别对应一个维度加分
+ */
+const questions = [
+  // placeholder 93-item bank; replace with actual question text
+  { id: 1, text: 'Question 1', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 2, text: 'Question 2', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 3, text: 'Question 3', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 4, text: 'Question 4', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 5, text: 'Question 5', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 6, text: 'Question 6', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 7, text: 'Question 7', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 8, text: 'Question 8', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 9, text: 'Question 9', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 10, text: 'Question 10', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 11, text: 'Question 11', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 12, text: 'Question 12', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 13, text: 'Question 13', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 14, text: 'Question 14', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 15, text: 'Question 15', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 16, text: 'Question 16', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 17, text: 'Question 17', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 18, text: 'Question 18', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 19, text: 'Question 19', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 20, text: 'Question 20', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 21, text: 'Question 21', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 22, text: 'Question 22', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 23, text: 'Question 23', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 24, text: 'Question 24', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 25, text: 'Question 25', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 26, text: 'Question 26', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 27, text: 'Question 27', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 28, text: 'Question 28', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 29, text: 'Question 29', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 30, text: 'Question 30', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 31, text: 'Question 31', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 32, text: 'Question 32', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 33, text: 'Question 33', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 34, text: 'Question 34', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 35, text: 'Question 35', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 36, text: 'Question 36', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 37, text: 'Question 37', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 38, text: 'Question 38', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 39, text: 'Question 39', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 40, text: 'Question 40', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 41, text: 'Question 41', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 42, text: 'Question 42', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 43, text: 'Question 43', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 44, text: 'Question 44', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 45, text: 'Question 45', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 46, text: 'Question 46', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 47, text: 'Question 47', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 48, text: 'Question 48', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 49, text: 'Question 49', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 50, text: 'Question 50', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 51, text: 'Question 51', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 52, text: 'Question 52', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 53, text: 'Question 53', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 54, text: 'Question 54', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 55, text: 'Question 55', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 56, text: 'Question 56', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 57, text: 'Question 57', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 58, text: 'Question 58', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 59, text: 'Question 59', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 60, text: 'Question 60', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 61, text: 'Question 61', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 62, text: 'Question 62', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 63, text: 'Question 63', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 64, text: 'Question 64', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 65, text: 'Question 65', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 66, text: 'Question 66', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 67, text: 'Question 67', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 68, text: 'Question 68', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 69, text: 'Question 69', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 70, text: 'Question 70', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 71, text: 'Question 71', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 72, text: 'Question 72', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 73, text: 'Question 73', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 74, text: 'Question 74', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 75, text: 'Question 75', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 76, text: 'Question 76', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 77, text: 'Question 77', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 78, text: 'Question 78', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 79, text: 'Question 79', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 80, text: 'Question 80', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 81, text: 'Question 81', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 82, text: 'Question 82', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 83, text: 'Question 83', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 84, text: 'Question 84', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 85, text: 'Question 85', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 86, text: 'Question 86', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 87, text: 'Question 87', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 88, text: 'Question 88', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 89, text: 'Question 89', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+  { id: 90, text: 'Question 90', optionA: 'Option A', optionB: 'Option B', dimensionA: 'S', dimensionB: 'N' },
+  { id: 91, text: 'Question 91', optionA: 'Option A', optionB: 'Option B', dimensionA: 'T', dimensionB: 'F' },
+  { id: 92, text: 'Question 92', optionA: 'Option A', optionB: 'Option B', dimensionA: 'J', dimensionB: 'P' },
+  { id: 93, text: 'Question 93', optionA: 'Option A', optionB: 'Option B', dimensionA: 'E', dimensionB: 'I' },
+];
+
+// 状态管理
+let current = 0;
+const total = questions.length;
+let answers = Array(total).fill(null);
+
+// 尝试从 sessionStorage 恢复
+if (typeof window !== 'undefined' && window.sessionStorage) {
+  const saved = window.sessionStorage.getItem('mbti-answers');
+  if (saved) {
+    try { answers = JSON.parse(saved); } catch {}
+  }
+}
+
+// 渲染题目
+function render() {
+  document.getElementById('q-index').textContent = `${String(current+1).padStart(2,'0')} / ${total}`;
+  document.getElementById('q-text').textContent = questions[current].text;
+  document.getElementById('optionA-text').textContent = `A. ${questions[current].optionA}`;
+  document.getElementById('optionB-text').textContent = `B. ${questions[current].optionB}`;
+  // 选项状态
+  document.getElementById('optionA').checked = answers[current] === 'A';
+  document.getElementById('optionB').checked = answers[current] === 'B';
+  // 按钮状态
+  document.getElementById('btn-prev').disabled = current === 0;
+  document.getElementById('btn-prev').style.visibility = current === 0 ? 'hidden' : 'visible';
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = current === total-1 ? '查看结果' : '下一题 >>';
+  // 进度条
+  document.getElementById('progress-bar').style.width = `${((current+1)/total)*100}%`;
+  // 选项高亮
+  document.getElementById('labelA').classList.toggle('selected', answers[current] === 'A');
+  document.getElementById('labelB').classList.toggle('selected', answers[current] === 'B');
+}
+
+document.getElementById('optionA').onclick = () => { answers[current] = 'A'; save(); render(); };
+document.getElementById('optionB').onclick = () => { answers[current] = 'B'; save(); render(); };
+// 选项点击，自动跳转下一题
+document.getElementById('optionA').onclick = () => {
+  answers[current] = 'A';
+  save();
+  if (current < total - 1) {
+    current++;
+  }
+  render();
+};
+document.getElementById('optionB').onclick = () => {
+  answers[current] = 'B';
+  save();
+  if (current < total - 1) {
+    current++;
+  }
+  render();
+};
+
+// 上一题
+document.getElementById('btn-prev').onclick = () => {
+  if (current > 0) { current--; render(); }
+};
+// 下一题/提交
+document.getElementById('btn-next').onclick = () => {
+  if (!answers[current]) {
+    alert('请选择一个选项后再继续');
+    return;
+  }
+  if (current < total-1) {
+    current++;
+    render();
+  } else {
+    // 计算结果
+    const dim = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+    questions.forEach((q, idx) => {
+      if (answers[idx] === 'A') dim[q.dimensionA]++;
+      if (answers[idx] === 'B') dim[q.dimensionB]++;
+    });
+    const type = `${dim.E>=dim.I?'E':'I'}${dim.S>=dim.N?'S':'N'}${dim.T>=dim.F?'T':'F'}${dim.J>=dim.P?'J':'P'}`;
+    window.sessionStorage.setItem('mbti-answers', JSON.stringify(answers));
+    window.location.href = `/result?type=${type}`;
+  }
+};
+
+// 保存答案
+function save() {
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    window.sessionStorage.setItem('mbti-answers', JSON.stringify(answers));
+  }
+}
+
+// 初始化
+render();
+</script>
+
+<style is:global>
+.mbti-test-card {
+  max-width: 480px;
+  margin: 40px auto 24px auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(74,108,247,0.10);
+  padding: 32px 28px 18px 28px;
+  font-family: 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  position: relative;
+}
+.mbti-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.mbti-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  letter-spacing: 1px;
+  color: #222;
+}
+.mbti-subtitle {
+  font-size: 1.08rem;
+  color: #8a8a8a;
+  margin-bottom: 0.5rem;
+}
+.mbti-question-area {
+  margin-bottom: 18px;
+}
+.mbti-q-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.mbti-q-index {
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: #4a6cf7;
+  letter-spacing: 1px;
+}
+.mbti-progress-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: #e7eaf3;
+  border-radius: 3px;
+  margin-left: 18px;
+  overflow: hidden;
+}
+.mbti-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4a6cf7 0%, #bc52ee 100%);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.mbti-q-text {
+  font-size: 1.13rem;
+  color: #222;
+  margin-bottom: 18px;
+  font-weight: 500;
+  min-height: 2.2em;
+}
+.mbti-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mbti-option {
+  display: flex;
+  align-items: center;
+  font-size: 1.05rem;
+  color: #333;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px 10px;
+  transition: background 0.18s;
+  border: 1.5px solid transparent;
+  user-select: none;
+}
+.mbti-option input[type=\"radio\"] {
+  accent-color: #4a6cf7;
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+}
+.mbti-option.selected {
+  background: #f0f4ff;
+  border-color: #4a6cf7;
+  color: #4a6cf7;
+  font-weight: 600;
+}
+.mbti-nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 22px 0 10px 0;
+}
+.mbti-btn {
+  border: none;
+  border-radius: 8px;
+  background: #f5f6fa;
+  color: #4a6cf7;
+  font-size: 1.08rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  box-shadow: 0 2px 8px rgba(74,108,247,0.04);
+}
+.mbti-btn:disabled,
+.mbti-btn[disabled] {
+  background: #f0f0f0;
+  color: #bdbdbd;
+  cursor: not-allowed;
+}
+.mbti-btn:hover:not(:disabled) {
+  background: #e7eaf3;
+  color: #bc52ee;
+}
+.mbti-note {
+  margin-top: 18px;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+.mbti-note-line {
+  margin-bottom: 2px;
+}
+@media (max-width: 600px) {
+  .mbti-test-card {
+    max-width: 99vw;
+    padding: 16px 4vw 10px 4vw;
+    margin: 16px auto 10px auto;
+  }
+  .mbti-title {
+    font-size: 1.3rem;
+  }
+  .mbti-subtitle {
+    font-size: 0.98rem;
+  }
+  .mbti-q-index {
+    font-size: 1rem;
+  }
+  .mbti-q-text {
+    font-size: 1rem;
+  }
+  .mbti-btn {
+    font-size: 1rem;
+    padding: 10px 0;
+    width: 48vw;
+    min-width: 110px;
+  }
+}
+</style>

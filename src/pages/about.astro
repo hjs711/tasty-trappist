@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="about-container">
+    <h1>关于 MBTI 性格测试</h1>
+    <p>欢迎来到我们的 MBTI 性格测试平台。在这里，你可以快速完成一个科学可靠的性格测评，并获取详细的个人分析报告。</p>
+
+    <section class="about-features">
+      <h2>平台优势</h2>
+      <ul>
+        <li>快速准确的在线测试，5分钟即可完成</li>
+        <li>基于权威理论的个性化解析</li>
+        <li>免费和高级解析任选，满足不同需求</li>
+        <li>严格保护隐私，用户数据不会公开</li>
+      </ul>
+    </section>
+
+    <section class="about-usage">
+      <h2>如何使用</h2>
+      <ol>
+        <li>返回<a href="/">首页</a>并点击“开始测试”按钮</li>
+        <li>根据提示完成问卷</li>
+        <li>提交后查看你的性格类型和分析</li>
+        <li>根据结果探索职业、关系和成长建议</li>
+      </ol>
+    </section>
+  </div>
+</Layout>
+
+<style>
+.about-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+}
+
+.about-container h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(83.21deg, #4a6cf7 0%, #bc52ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about-container p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.about-features h2,
+.about-usage h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.8rem;
+  color: #4a6cf7;
+}
+
+.about-features ul,
+.about-usage ol {
+  margin-left: 1.2rem;
+}
+
+.about-features li,
+.about-usage li {
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+}
+
+.about-usage a {
+  color: #4a6cf7;
+  text-decoration: none;
+}
+.about-usage a:hover {
+  text-decoration: underline;
+}
+</style>

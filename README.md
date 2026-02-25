@@ -1,10 +1,12 @@
-# Astro Starter Kit: Basics
+# MBTI 性格测试网站
+
+一个基于 Astro 的轻量型网站，用于进行 MBTI 性格类型评估，并展示测试简介、功能亮点以及解析选项。
 
 ```sh
 npm create astro@latest -- --template basics
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+> 🧑‍🚀 **这是一个自定义项目模板，已修改为 MBTI 性格测试主题。**
 
 ## 🚀 Project Structure
 
