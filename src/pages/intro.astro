@@ -3,24 +3,45 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-  <div class="intro-card">
-    <h1 class="intro-title">温馨提示</h1>
-    <ul class="intro-list">
-      <li>本测试基于荣格的人格分类理论，共93题。</li>
-      <li>预计耗时约25分钟，请确保时间充足。</li>
-      <li>答案无对错，凭第一直觉选择即可。</li>
-    </ul>
-    <button class="intro-btn" id="start-btn">开始答题</button>
+  <div class="intro-container">
+    <div class="intro-card">
+      <h1 class="intro-title">原始 93 题测试</h1>
+      <ul class="intro-list">
+        <li>保持原始题库和交互方式（两项选择）。</li>
+        <li>预计耗时约 20~30 分钟。</li>
+        <li>答案无对错，凭第一直觉选择即可。</li>
+      </ul>
+      <button class="intro-btn" id="start-btn-original">开始 93 题</button>
+    </div>
+    <div class="intro-card">
+      <h1 class="intro-title">新版 100 题多维测评</h1>
+      <ul class="intro-list">
+        <li>共 100 道题，采用 1~5 分评分（非常不同意→非常同意）。</li>
+        <li>题目顺序会随机打乱，每次测试体验不同。</li>
+        <li>完成后将生成更丰富的 AI 个性分析。</li>
+      </ul>
+      <button class="intro-btn" id="start-btn-new">开始 100 题</button>
+    </div>
   </div>
 </Layout>
 
 <script type="module">
-  document.getElementById('start-btn').addEventListener('click', () => {
-    window.location.href = '/test';
+  document.getElementById('start-btn-original').addEventListener('click', () => {
+    window.location.href = '/test?bank=original';
+  });
+  document.getElementById('start-btn-new').addEventListener('click', () => {
+    window.location.href = '/test?bank=new';
   });
 </script>
 
 <style is:global>
+.intro-container {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
 .intro-card {
   max-width: 480px;
   margin: 80px auto;
@@ -61,6 +82,10 @@ import Layout from '../layouts/Layout.astro';
   box-shadow: 0 4px 16px rgba(74,108,247,0.18);
 }
 @media (max-width: 600px) {
+  .intro-container {
+    flex-direction: column;
+    align-items: center;
+  }
   .intro-card {
     margin: 40px 4vw;
     padding: 24px 16px;

@@ -5,8 +5,8 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
   <div class="mbti-test-card">
     <header class="mbti-header">
-      <h1 class="mbti-title">MBTI性格特质测试</h1>
-      <div class="mbti-subtitle">国际通用版MBTI人格测试(16人格)</div>
+        <h1 class="mbti-title" id="test-title">MBTI性格特质测试</h1>
+        <div class="mbti-subtitle" id="test-subtitle">国际通用版MBTI人格测试(16人格)</div>
     </header>
     <section class="mbti-question-area">
       <div class="mbti-q-top">
@@ -17,14 +17,27 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <div class="mbti-q-text" id="q-text"></div>
       <div class="mbti-options">
-        <label class="mbti-option" id="labelA">
-          <input type="radio" name="mbti-option" id="optionA" value="A" />
-          <span class="mbti-option-text" id="optionA-text"></span>
-        </label>
-        <label class="mbti-option" id="labelB">
-          <input type="radio" name="mbti-option" id="optionB" value="B" />
-          <span class="mbti-option-text" id="optionB-text"></span>
-        </label>
+        <div id="options-container">
+          <label class="mbti-option" id="labelA">
+            <input type="radio" name="mbti-option" id="optionA" value="A" />
+            <span class="mbti-option-text" id="optionA-text"></span>
+          </label>
+          <label class="mbti-option" id="labelB">
+            <input type="radio" name="mbti-option" id="optionB" value="B" />
+            <span class="mbti-option-text" id="optionB-text"></span>
+          </label>
+        </div>
+        <div id="rating-container" style="display:none; gap:8px; justify-content:center;">
+          <!-- numeric 1-5 for new bank -->
+          <label><input type="radio" name="rating" value="1">1</label>
+          <label><input type="radio" name="rating" value="2">2</label>
+          <label><input type="radio" name="rating" value="3">3</label>
+          <label><input type="radio" name="rating" value="4">4</label>
+          <label><input type="radio" name="rating" value="5">5</label>
+        </div>
+          <div class="mbti-note" id="rating-note" style="display:none;">
+            <div class="mbti-note-line">1 = 非常不同意，5 = 非常同意，3 = 中立</div>
+          </div>
       </div>
     </section>
     <div class="mbti-nav-row">
@@ -36,11 +49,9 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script type="module" client:load>
-/**
- * 题库数据，93题，覆盖E/I、S/N、T/F、J/P四个维度
- * 每题A/B分别对应一个维度加分
- */
-const questions = [
+// 原始93题库（保持不变）
+// 每题A/B分别对应一个维度加分
+const origQuestions = [
   { id: 1, text: "当你参加社交聚会时，你倾向于：", optionA: "与多数人交谈，包括陌生人。", optionB: "寻找熟悉的人或小团体进行深入交流。", dimensionA: "E", dimensionB: "I" },
   { id: 2, text: "你更喜欢：", optionA: "多样化和变化的生活。", optionB: "有规律和可预测的生活。", dimensionA: "N", dimensionB: "S" },
   { id: 3, text: "遇到问题时，你更依赖：", optionA: "逻辑分析。", optionB: "个人价值观和感受。", dimensionA: "T", dimensionB: "F" },
@@ -136,16 +147,147 @@ const questions = [
   { id: 93, text: "在下列每一对词语中，哪一个词语更合你心意？", optionA: "实际。", optionB: "创新。", dimensionA: "S", dimensionB: "N" },
 ];
 
+// 新题库（100题），用户评分 1-5，题目顺序将随机化
+const newQuestions = [
+  { id: 1, text: `我通常主动与陌生人交谈。`, dimension: 'E' },
+  { id: 2, text: `独处时我感到精力充沛。`, dimension: 'I' },
+  { id: 3, text: `我喜欢参加大型社交聚会。`, dimension: 'E' },
+  { id: 4, text: `我经常思考后再表达。`, dimension: 'I' },
+  { id: 5, text: `人们认为我比较外向。`, dimension: 'E' },
+  { id: 6, text: `我不喜欢成为众人瞩目的焦点。`, dimension: 'I' },
+  { id: 7, text: `我很容易与刚认识的人聊起来。`, dimension: 'E' },
+  { id: 8, text: `我倾向于保留自己的想法而不是说出来。`, dimension: 'I' },      
+  { id: 9, text: `从社交中获得能量。`, dimension: 'E' },
+  { id: 10, text: `我需要大量时间独处。`, dimension: 'I' },
+  { id: 11, text: `我喜欢团队合作胜于单独工作。`, dimension: 'E' },
+  { id: 12, text: `我说话比较谨慎。`, dimension: 'I' },
+  { id: 13, text: `我经常主动联系朋友。`, dimension: 'E' },
+  { id: 14, text: `在社交场合我会感到疲惫。`, dimension: 'I' },
+  { id: 15, text: `我喜欢主持聚会或活动。`, dimension: 'E' },
+  { id: 16, text: `我通常倾听多于发言。`, dimension: 'I' },
+  { id: 17, text: `我擅长同时与多人交流。`, dimension: 'E' },
+  { id: 18, text: `我不太愿意分享个人细节。`, dimension: 'I' },
+  { id: 19, text: `我认为自己是个热情的人。`, dimension: 'E' },
+  { id: 20, text: `我避免成为注意中心。`, dimension: 'I' },
+  { id: 21, text: `我常常是第一个打破沉默的人。`, dimension: 'E' },
+  { id: 22, text: `我宁愿用文字交流而不是当面交谈。`, dimension: 'I' },
+  { id: 23, text: `我喜欢认识新朋友。`, dimension: 'E' },
+  { id: 24, text: `我很难记住别人的名字。`, dimension: 'I' },
+  { id: 25, text: `我在群体中经常带头讲话。`, dimension: 'E' },
+  { id: 26, text: `我喜欢关注现实发生的事。`, dimension: 'S' },
+  { id: 27, text: `我经常思考未来可能发生的事情。`, dimension: 'N' },
+  { id: 28, text: `我对抽象概念很感兴趣。`, dimension: 'N' },
+  { id: 29, text: `我更相信具体的事实而非理论。`, dimension: 'S' },
+  { id: 30, text: `我经常思考事物背后的意义。`, dimension: 'N' },
+  { id: 31, text: `我注重细节和精确性。`, dimension: 'S' },
+  { id: 32, text: `我擅长想象新的可能性。`, dimension: 'N' },
+  { id: 33, text: `我倾向于按部就班地做事。`, dimension: 'S' },
+  { id: 34, text: `我喜欢探索各种想法和关联。`, dimension: 'N' },
+  { id: 35, text: `我觉得讨论理论很无聊。`, dimension: 'S' },
+  { id: 36, text: `我常常沉思和做白日梦。`, dimension: 'N' },
+  { id: 37, text: `我更关注眼前的事而不是长远。`, dimension: 'S' },
+  { id: 38, text: `我乐于思考符号和隐喻。`, dimension: 'N' },
+  { id: 39, text: `我喜欢使用已知的方法解决问题。`, dimension: 'S' },
+  { id: 40, text: `我容易被幻想或电影吸引。`, dimension: 'N' },
+  { id: 41, text: `我宁愿实践而不是空谈理论。`, dimension: 'S' },
+  { id: 42, text: `我经常预测未来的趋势。`, dimension: 'N' },
+  { id: 43, text: `我偏爱具体明确的指示。`, dimension: 'S' },
+  { id: 44, text: `我喜欢富有创意的工作。`, dimension: 'N' },
+  { id: 45, text: `我很少关注事物的象征意义。`, dimension: 'S' },
+  { id: 46, text: `我乐于设想新的系统或框架。`, dimension: 'N' },
+  { id: 47, text: `我通常相信经验胜过直觉。`, dimension: 'S' },
+  { id: 48, text: `我喜欢讨论哲学问题。`, dimension: 'N' },
+  { id: 49, text: `我更擅长处理事实和数据。`, dimension: 'S' },
+  { id: 50, text: `我相信直觉往往是对的。`, dimension: 'N' },
+  { id: 51, text: `做决定时，我主要依靠逻辑分析。`, dimension: 'T' },
+  { id: 52, text: `我很容易设身处地为他人着想。`, dimension: 'F' },
+  { id: 53, text: `我觉得公平比同情更重要。`, dimension: 'T' },
+  { id: 54, text: `我经常因别人的故事而感动。`, dimension: 'F' },
+  { id: 55, text: `我更看重原则而非人情。`, dimension: 'T' },
+  { id: 56, text: `我尽量避免伤害别人的感情。`, dimension: 'F' },
+  { id: 57, text: `我倾向于客观地处理问题。`, dimension: 'T' },
+  { id: 58, text: `我善于理解别人的情绪。`, dimension: 'F' },
+  { id: 59, text: `我认为批评应当直接而诚实。`, dimension: 'T' },
+  { id: 60, text: `我喜欢给人温暖的关怀。`, dimension: 'F' },
+  { id: 61, text: `我通常用理性战胜感性。`, dimension: 'T' },
+  { id: 62, text: `我很容易受到他人情绪影响。`, dimension: 'F' },
+  { id: 63, text: `我更关注事情的对错而非感受。`, dimension: 'T' },
+  { id: 64, text: `我喜欢调解人际关系冲突。`, dimension: 'F' },
+  { id: 65, text: `做决策前我习惯列出利弊。`, dimension: 'T' },
+  { id: 66, text: `我常常迁就他人的需求。`, dimension: 'F' },
+  { id: 67, text: `我重视公正的制度。`, dimension: 'T' },
+  { id: 68, text: `我倾向于宽容和体谅。`, dimension: 'F' },
+  { id: 69, text: `我很少因个人感情影响判断。`, dimension: 'T' },
+  { id: 70, text: `我通常优先考虑团队的和谐。`, dimension: 'F' },
+  { id: 71, text: `我喜欢辩论和讨论。`, dimension: 'T' },
+  { id: 72, text: `我容易被悲伤的故事打动。`, dimension: 'F' },
+  { id: 73, text: `我认为诚实比委婉更重要。`, dimension: 'T' },
+  { id: 74, text: `我善于抚慰他人的情绪。`, dimension: 'F' },
+  { id: 75, text: `我往往基于价值观做出决定。`, dimension: 'F' },
+  { id: 76, text: `我喜欢制定详细的计划。`, dimension: 'J' },
+  { id: 77, text: `我乐于保持开放的选择。`, dimension: 'P' },
+  { id: 78, text: `我通常会提前安排好日程。`, dimension: 'J' },
+  { id: 79, text: `我倾向于随性而为。`, dimension: 'P' },
+  { id: 80, text: `我喜欢事情井井有条。`, dimension: 'J' },
+  { id: 81, text: `我经常拖延到最后时刻。`, dimension: 'P' },
+  { id: 82, text: `我偏好结构化和确定的任务。`, dimension: 'J' },
+  { id: 83, text: `我享受适应不断变化的环境。`, dimension: 'P' },
+  { id: 84, text: `我会列出待办事项清单。`, dimension: 'J' },
+  { id: 85, text: `我喜欢探索不同的可能性而不急于决定。`, dimension: 'P' },     
+  { id: 86, text: `我通常准时完成任务。`, dimension: 'J' },
+  { id: 87, text: `我经常改变主意。`, dimension: 'P' },
+  { id: 88, text: `我喜欢按规则和程序行事。`, dimension: 'J' },
+  { id: 89, text: `我乐于即兴发挥。`, dimension: 'P' },
+  { id: 90, text: `我觉得混乱的环境让我不舒服。`, dimension: 'J' },
+  { id: 91, text: `我喜欢灵活性胜过固定安排。`, dimension: 'P' },
+  { id: 92, text: `我做事有条不紊。`, dimension: 'J' },
+  { id: 93, text: `我容易分心难以坚持计划。`, dimension: 'P' },
+  { id: 94, text: `我倾向于早早开始工作。`, dimension: 'J' },
+  { id: 95, text: `我常常在最后关头才匆忙完成。`, dimension: 'P' },
+  { id: 96, text: `我喜欢生活有规律。`, dimension: 'J' },
+  { id: 97, text: `我更喜欢没有严格期限的任务。`, dimension: 'P' },
+  { id: 98, text: `我注重承诺和守时。`, dimension: 'J' },
+  { id: 99, text: `我通常同时开展多项任务但没有完成计划。`, dimension: 'P' },   
+  { id: 100, text: `我会仔细记录开支和时间。`, dimension: 'J' },
+];
+
 // 状态管理
 let current = 0;
-const total = questions.length;
-let answers = Array(total).fill(null);
+// will be set after picking bank
+let questions = [];
+let total = 0;
+let answers = [];
+let isNewBank = false;
 
-// 尝试从 sessionStorage 恢复
-if (typeof window !== 'undefined' && window.sessionStorage) {
+// helper to shuffle array in place
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// 根据URL决定题库
+if (typeof window !== 'undefined') {
+  const params = new URLSearchParams(window.location.search);
+  const bank = params.get('bank');
+  if (bank === 'new') {
+    isNewBank = true;
+    questions = shuffle([...newQuestions]);
+    // persist order so results page can recalc dimensions
+    window.sessionStorage.setItem('mbti-questions', JSON.stringify(questions));
+  } else {
+    questions = origQuestions;
+    window.sessionStorage.removeItem('mbti-questions');
+  }
+  total = questions.length;
+  answers = Array(total).fill(null);
+
+  // 尝试从 sessionStorage 恢复答案
   const saved = window.sessionStorage.getItem('mbti-answers');
   if (saved) {
-    try { answers = JSON.parse(saved); } catch {}
+    try { answers = JSON.parse(saved); } catch {};
   }
 }
 
@@ -153,11 +295,43 @@ if (typeof window !== 'undefined' && window.sessionStorage) {
 function render() {
   document.getElementById('q-index').textContent = `${String(current+1).padStart(2,'0')} / ${total}`;
   document.getElementById('q-text').textContent = questions[current].text;
-  document.getElementById('optionA-text').textContent = `A. ${questions[current].optionA}`;
-  document.getElementById('optionB-text').textContent = `B. ${questions[current].optionB}`;
-  // 选项状态
-  document.getElementById('optionA').checked = answers[current] === 'A';
-  document.getElementById('optionB').checked = answers[current] === 'B';
+  // set header text on first render
+  if (current === 0) {
+    if (isNewBank) {
+      document.getElementById('test-title').textContent = '100题多维MBTI测评';
+      document.getElementById('test-subtitle').textContent = '请用1-5分为题目评分，越符合越高分';
+    } else {
+      document.getElementById('test-title').textContent = 'MBTI性格特质测试';
+      document.getElementById('test-subtitle').textContent = '国际通用版MBTI人格测试(16人格)';
+    }
+  }
+  if (isNewBank) {
+    // show numeric rating options
+    document.getElementById('rating-container').style.display = 'flex';
+    document.getElementById('options-container').style.display = 'none';
+    document.getElementById('rating-note').style.display = 'block';
+    // fill radio group
+    const val = answers[current];
+    document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = (r.value === String(val)));
+    // highlight selected label
+    document.querySelectorAll('#rating-container label').forEach(lbl => {
+      const inp = lbl.querySelector('input');
+      lbl.classList.toggle('selected', inp.checked);
+    });
+  } else {
+    document.getElementById('rating-container').style.display = 'none';
+    document.getElementById('options-container').style.display = 'flex';
+    document.getElementById('rating-note').style.display = 'none';
+    document.getElementById('optionA-text').textContent = `A. ${questions[current].optionA}`;
+    document.getElementById('optionB-text').textContent = `B. ${questions[current].optionB}`;
+    document.getElementById('optionA').checked = answers[current] === 'A';
+    document.getElementById('optionB').checked = answers[current] === 'B';
+  }
+  // 选项高亮
+  if (!isNewBank) {
+    document.getElementById('labelA').classList.toggle('selected', answers[current] === 'A');
+    document.getElementById('labelB').classList.toggle('selected', answers[current] === 'B');
+  }
   // 按钮状态
   document.getElementById('btn-prev').disabled = current === 0;
   document.getElementById('btn-prev').style.visibility = current === 0 ? 'hidden' : 'visible';
@@ -172,23 +346,30 @@ function render() {
 
 document.getElementById('optionA').onclick = () => { answers[current] = 'A'; save(); render(); };
 document.getElementById('optionB').onclick = () => { answers[current] = 'B'; save(); render(); };
-// 选项点击，自动跳转下一题
-document.getElementById('optionA').onclick = () => {
-  answers[current] = 'A';
-  save();
-  if (current < total - 1) {
-    current++;
-  }
-  render();
-};
-document.getElementById('optionB').onclick = () => {
-  answers[current] = 'B';
-  save();
-  if (current < total - 1) {
-    current++;
-  }
-  render();
-};
+// 选择方式
+if (isNewBank) {
+  document.querySelectorAll('input[name="rating"]').forEach(r => {
+    r.onclick = () => {
+      answers[current] = r.value;
+      save();
+      if (current < total - 1) { current++; }
+      render();
+    };
+  });
+} else {
+  document.getElementById('optionA').onclick = () => {
+    answers[current] = 'A';
+    save();
+    if (current < total - 1) { current++; }
+    render();
+  };
+  document.getElementById('optionB').onclick = () => {
+    answers[current] = 'B';
+    save();
+    if (current < total - 1) { current++; }
+    render();
+  };
+}
 
 // 上一题
 document.getElementById('btn-prev').onclick = () => {
@@ -197,7 +378,7 @@ document.getElementById('btn-prev').onclick = () => {
 // 下一题/提交
 document.getElementById('btn-next').onclick = () => {
   if (!answers[current]) {
-    alert('请选择一个选项后再继续');
+    alert('请选择一个选项或评分后再继续');
     return;
   }
   if (current < total-1) {
@@ -207,12 +388,21 @@ document.getElementById('btn-next').onclick = () => {
     // 计算结果
     const dim = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
     questions.forEach((q, idx) => {
-      if (answers[idx] === 'A') dim[q.dimensionA]++;
-      if (answers[idx] === 'B') dim[q.dimensionB]++;
+      if (isNewBank) {
+        const score = parseInt(answers[idx],10);
+        if (isNaN(score)) return;
+        const letter = q.dimension;
+        const opposite = {E:'I',I:'E',S:'N',N:'S',T:'F',F:'T',J:'P',P:'J'}[letter];
+        if (score > 3) dim[letter] += score - 3;
+        if (score < 3) dim[opposite] += 3 - score;
+      } else {
+        if (answers[idx] === 'A') dim[q.dimensionA]++;
+        if (answers[idx] === 'B') dim[q.dimensionB]++;
+      }
     });
     const type = `${dim.E>=dim.I?'E':'I'}${dim.S>=dim.N?'S':'N'}${dim.T>=dim.F?'T':'F'}${dim.J>=dim.P?'J':'P'}`;
     window.sessionStorage.setItem('mbti-answers', JSON.stringify(answers));
-    window.location.href = `/result?type=${type}`;
+    window.location.href = `/result?type=${type}${isNewBank?'&bank=new':''}`;
   }
 };
 
@@ -294,6 +484,28 @@ render();
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+#rating-container {
+  display: flex;
+  gap: 12px;
+}
+#rating-container label {
+  cursor: pointer;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  user-select: none;
+}
+#rating-container input[type="radio"] {
+  display: none;
+}
+#rating-container label.selected {
+  background: #f0f4ff;
+  border-color: #4a6cf7;
+  color: #4a6cf7;
+  font-weight: 600;
 }
 .mbti-option {
   display: flex;

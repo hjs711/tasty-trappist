@@ -120,12 +120,60 @@ function getTypeFromUrl() {
 }
 
 const type = getTypeFromUrl();
+const params = new URLSearchParams(window.location.search);
+const bank = params.get('bank');
 const data = mbtiData[type];
+const isNew = bank === 'new';
 if (data) {
   document.getElementById('type-title').innerHTML = `<h2>${data.name}</h2>`;
   document.getElementById('type-desc').innerHTML = `<p>${data.desc}</p>`;
   document.getElementById('type-adv').innerHTML = `<p>${data.adv}</p>`;
   document.getElementById('type-career').innerHTML = `<p>${data.career}</p>`;
+    // 会员提示
+    const payHint = document.createElement('div');
+    payHint.style.marginTop = '20px';
+    payHint.style.textAlign = 'center';
+    payHint.innerHTML = `<strong>会员专享更多分析</strong> - <a href="/subscribe" style="color:#4a6cf7;text-decoration:underline;">立即开通</a>`;
+    document.getElementById('mbti-result').appendChild(payHint);
+  if (isNew) {
+    // append placeholder sections for extended AI evaluation
+    const extra = document.createElement('div');
+    extra.innerHTML = `
+      <h3>AI 个性评估</h3>
+      <p>基于您的回答，我们的系统还生成了一份个性化报告，涵盖性格、未来职业方向、事业发展、爱情关系等热门话题。</p>
+      <ul>
+        <li>性格：您倾向于 ${type} 类型，具有对应的优势和挑战。</li>
+        <li>职业方向：根据您的偏好，推荐行业或岗位的通用建议。</li>
+        <li>事业：分析您在团队与领导力方面的潜质。</li>
+        <li>爱情：您的情感表达和需求特点。</li>
+      </ul>
+      <p>（本页面为示例，具体内容可接入后端AI服务以获得更深入分析。）</p>
+    `;
+    document.getElementById('mbti-result').appendChild(extra);
+    // compute dimension intensities if we have stored question order
+    const qa = window.sessionStorage.getItem('mbti-answers');
+    const qj = window.sessionStorage.getItem('mbti-questions');
+    if (qa && qj) {
+      try {
+        const answersArr = JSON.parse(qa);
+        const questionsArr = JSON.parse(qj);
+        const dimCounts = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+        questionsArr.forEach((q, idx) => {
+          const score = parseInt(answersArr[idx],10);
+          if (isNaN(score)) return;
+          const letter = q.dimension;
+          const opposite = {E:'I',I:'E',S:'N',N:'S',T:'F',F:'T',J:'P',P:'J'}[letter];
+          if (score > 3) dimCounts[letter] += score - 3;
+          if (score < 3) dimCounts[opposite] += 3 - score;
+        });
+        const intensityEl = document.createElement('div');
+        intensityEl.innerHTML = `<h4>各维度走势</h4><p>${Object.entries(dimCounts).map(([k,v])=>`${k}:${v}`).join(' | ')}</p>`;
+        document.getElementById('mbti-result').appendChild(intensityEl);
+      } catch(e) {
+        console.warn('无法解析扩展答案', e);
+      }
+    }
+  }
 } else {
   document.getElementById('mbti-result').innerHTML = '<p>未检测到有效的 MBTI 类型，请先完成测试。</p>';
 }
@@ -163,4 +211,12 @@ if (data) {
 #mbti-result p {
   margin: 0.5rem 0;
 }
+
+  /* 会员提示样式 */
+  #mbti-result div {
+    font-size: 1rem;
+  }
+  #mbti-result a {
+    font-weight: 600;
+  }
 </style>
