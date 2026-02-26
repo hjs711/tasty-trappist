@@ -9,47 +9,37 @@ import background from '../assets/background.svg';
 			<h1>MBTI 性格测试</h1>
 			<section id="links">
 				<a class="button" href="/intro">开始测试</a>
-				<a class="secondary-button" href="/about">了解原理</a>
 			</section>
 			<p>探索你的性格类型，了解你的优势、劣势和潜在的职业方向。</p>
-			<!-- 信息卡片展示两种模式及有趣事实 -->
-			<div id="test-info">
-				<div class="info-card">
-					<h3>双模式测评</h3>
-					<p>选择传统 93 题快速版或全新 100 题多维版，每次题目随机，体验新鲜。</p>
-				</div>
-				<div class="info-card" id="fun-fact">
-					<h3>趣味小贴士</h3>
-					<p>加载中...</p>
-				</div>
-			</div>
+			<!-- 其余内容保持不变，可根据需要补充 -->
 		</section>
 	</main>
 
-	<!-- 解析选项板块已移除，改为扩展会员提示 -->
-</div>
-	<!-- 功能亮点放置在解析选项下方 -->
-	<section id="features">
-		<h2>功能亮点</h2>
-		<div class="features-grid">
-			<div class="feature-card">
-				<h3>实时反馈</h3>
-				<p>答案提交后立即显示你的MBTI类型。</p>
+	<div id="pricing-info" class="box">
+		<h2>解析选项</h2>
+		<div class="pricing-cards">
+			<div class="pricing-card free">
+				<h3>免费解析</h3>
+				<ul>
+					<li>基本性格类型</li>
+					<li>核心优势</li>
+					<li>简要职业建议</li>
+				</ul>
 			</div>
-			<div class="feature-card">
-				<h3>隐私安全</h3>
-				<p>所有数据仅保存在本地，不会提交到服务器。</p>
-			</div>
-			<div class="feature-card">
-				<h3>移动友好</h3>
-				<p>从手机到桌面均有良好体验。</p>
-			</div>
-			<div class="feature-card">
-				<h3>无广告</h3>
-				<p>纯粹的心理测试，无干扰。</p>
+			<div class="pricing-card premium">
+				<h3>高级解析</h3>
+				<ul>
+					<li>详细性格分析</li>
+					<li>全面优势劣势</li>
+					<li>个性化职业规划</li>
+					<li>人际关系建议</li>
+					<li>个人成长路径</li>
+				</ul>
 			</div>
 		</div>
-	</section>
+	</div>
+</div>
+
 <script>
 	// 为后续页面交互做准备
 	function startTest() {
@@ -57,28 +47,12 @@ import background from '../assets/background.svg';
 		window.location.href = '/test';
 	}
 	
-	// 随机趣味事实
-	const facts = [
-		"据统计，约1%人群是INFJ，是最稀有的MBTI类型。",
-		"MBTI源于荣格心理类型理论，由凯瑟琳·布里格斯和伊莎贝尔·迈尔斯发展。",
-		"选择题目顺序随机可减少记忆答案影响，提高测试可靠性。",
-		"你可以多次测试；上下文、心情会影响结果。",
-		"全球有超过2000万人接受过MBTI评估，广泛用于职业发展。"
-	];
-	function showFact() {
-		const el = document.querySelector('#fun-fact p');
-		if (el) {
-			el.textContent = facts[Math.floor(Math.random()*facts.length)];
-		}
-	}
-	
-	// 为按钮添加点击事件并初始化内容
+	// 为按钮添加点击事件
 	document.addEventListener('DOMContentLoaded', function() {
 		const startButton = document.querySelector('.button');
 		if (startButton) {
 			startButton.addEventListener('click', startTest);
 		}
-		showFact();
 	});
 </script>
 
@@ -217,9 +191,6 @@ import background from '../assets/background.svg';
 		width: 100%;
 	}
 
-	#features {
-		margin-top: 3rem;
-	}
 	#features h2 {
 		font-size: 1.4rem;
 		color: #111827;
@@ -227,10 +198,10 @@ import background from '../assets/background.svg';
 	}
 
 	.features-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		display: flex;
 		gap: 20px;
-		justify-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
 	}
 
 	.feature-card {
@@ -262,7 +233,25 @@ import background from '../assets/background.svg';
 		backdrop-filter: blur(50px);
 	}
 
-	/* pricing-info section removed */
+	#pricing-info {
+		/* 放在文档流中，避免覆盖其他内容 */
+		position: relative;
+		margin: 3rem auto 0 auto;
+		max-width: 900px;
+		width: 95%;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	#pricing-info h2 {
+		margin: 0 0 20px;
+		font-weight: 600;
+		color: #111827;
+		font-size: 1.5rem;
+		text-align: center;
+	}
 
 	.pricing-cards {
 		display: flex;
@@ -322,6 +311,33 @@ import background from '../assets/background.svg';
 		color: #4b5563;
 	}
 
+	@media screen and (max-height: 600px) {
+	       #pricing-info {
+		       display: none;
+	       }
+	}
+
+	@media screen and (max-width: 900px) {
+	       #pricing-info {
+		       width: 99%;
+		       max-width: 99vw;
+	       }
+	       .pricing-cards {
+		       flex-direction: column;
+		       align-items: center;
+		       gap: 16px;
+	       }
+	       #links {
+		       flex-direction: column;
+		       gap: 12px;
+	       }
+	}
+
+	@media screen and (max-width: 768px) {
+		#container {
+			display: flex;
+			flex-direction: column;
+		}
 
 		#hero {
 			display: block;
@@ -360,7 +376,24 @@ import background from '../assets/background.svg';
 			align-self: center;
 		}
 
-	/* removed pricing media rules */
+		.pricing-cards {
+			flex-direction: column;
+		}
+
+		.pricing-card {
+			width: 100%;
+			box-sizing: border-box;
+		}
+	}
+
+	.home-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(83.21deg, #4a6cf7 0%, #bc52ee 100%);
+  color: #fff;
+  border: none;
   padding: 14px 48px;
   border-radius: 12px;
   font-size: 1.18rem;
